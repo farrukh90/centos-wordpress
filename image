@@ -1,0 +1,31 @@
+{
+    "variables": {
+        "WORDPRESS_VERSION": ""
+    },
+    "builders": [
+        {
+            "type": "amazon-ebs",
+            "region": "eu-west-1",
+            "source_ami": "ami-07683a44e80cd32c5",
+            "instance_type": "t2.micro",
+            "ssh_username": "ec2-user",
+            "ami_name": "wordpress-{{timestamp}}"
+        }
+    ],
+    "provisioners": [
+        {
+            "type": "shell",
+            "inline": [
+                "sudo yum install httpd wget -y",
+                "sudo yum install php php-mysql -y",
+                "sudo yum install php-gd mariadb-server -y",
+                "sudo yum install mysql -y",
+                "sudo systemctl start httpd",
+                "sudo wget https://wordpress.org/wordpress-{{WORDPRESS_VERSION}}.zip",
+                "tar xzvf wordpress-{{WORDPRESS_VERSION}}.zip",
+                "sudo rsync -avP ~/wordpress/ /var/www/html/",
+                "sudo chown -R apache:apache /var/www/html/*"
+            ]
+        }
+    ]
+}
